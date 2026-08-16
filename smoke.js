@@ -64,6 +64,17 @@ try {
     const skript = await fetch(`${ADRESSE}/spiel.js`);
     pruefe("Spielcode wird ausgeliefert", skript.status === 200);
 
+    // Das Overlay bricht still: fehlt die Datei, ist die Liste einfach leer und
+    // niemand merkt es. Deshalb hier gefragt.
+    const stand = await fetch(`${ADRESSE}/SPIELSTAND.md`);
+    const spielstand = await stand.text();
+    pruefe(
+      "Ideenliste ist da",
+      stand.status === 200 &&
+        spielstand.includes("## Ideenliste") &&
+        html.includes('id="ideen"'),
+    );
+
     // Kodiert, damit der Client den Pfad nicht schon wegnormalisiert und der
     // Schutz im Server tatsächlich gefragt wird.
     const verboten = await fetch(`${ADRESSE}/%2e%2e%2f%2e%2e%2fetc%2fpasswd`);

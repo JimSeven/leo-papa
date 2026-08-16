@@ -19,6 +19,7 @@ const TYPEN = {
   ".js": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8", // SPIELSTAND.md, gelesen von der Ideenliste
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".gif": "image/gif",
@@ -65,7 +66,9 @@ const server = createServer(async (req, res) => {
 });
 
 // Nur was das Spiel ausmacht, löst ein Neu-Laden aus. Sonst wirft jede Notiz,
-// die nebenbei geschrieben wird, Leopold aus dem laufenden Spiel.
+// die nebenbei geschrieben wird, Leopold aus dem laufenden Spiel. Auch
+// SPIELSTAND.md steht bewusst nicht drin: die Ideenliste liest sich bei jedem
+// Öffnen neu, ein Reload wäre nur Störung.
 const SPIELDATEIEN = /\.(html|js|css|png|jpg|gif|svg)$/i;
 
 // fs.watch feuert pro Speichervorgang mehrfach — kurz sammeln, dann einmal senden.

@@ -16,10 +16,65 @@
       canvas {
         display: block;
       }
+
+      /* Leopolds Ideenliste, Taste i. Bewusst DOM statt Canvas: Zeilenumbruch,
+         Scrollen und Emoji gibt es hier geschenkt. */
+      #ideen {
+        position: fixed;
+        inset: 0;
+        overflow-y: auto;
+        background: rgba(16, 19, 26, 0.97); /* dieselbe Farbe wie HINTERGRUND */
+        color: #e8ecf4;
+        font: 26px/1.5 system-ui, sans-serif;
+      }
+      #ideen .blatt {
+        max-width: 26em;
+        margin: 0 auto;
+        padding: 8vh 6vw;
+      }
+      #ideen .naechstes {
+        margin: 0 0 2em;
+        color: #ffd23f;
+      }
+      #ideen h1 {
+        margin: 0 0 1em;
+        font-size: 1.4em;
+      }
+      #ideen ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      #ideen li {
+        margin: 0.7em 0;
+      }
+      #ideen li::before {
+        content: "⬜";
+        margin-right: 0.5em;
+      }
+      #ideen li.fertig {
+        color: #7d8598;
+      }
+      #ideen li.fertig::before {
+        content: "✅";
+      }
+      #ideen .leer {
+        margin: 0;
+        color: #7d8598;
+      }
     </style>
   </head>
   <body>
     <canvas id="bild"></canvas>
+
+    <div id="ideen" hidden>
+      <div class="blatt">
+        <p class="naechstes" hidden></p>
+        <h1>Das bauen wir noch</h1>
+        <ul></ul>
+        <p class="leer">Hier landen deine Ideen, die wir noch bauen.</p>
+      </div>
+    </div>
 
     <script type="module">
       // Der Zeitstempel umgeht den Browser-Cache: GitHub Pages lässt Dateien

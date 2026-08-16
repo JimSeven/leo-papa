@@ -52,6 +52,99 @@ addEventListener("keyup", (e) => gedrueckt.delete(taste(e)));
 addEventListener("blur", () => gedrueckt.clear()); // Fenster verlassen = alle Tasten los
 
 // ---------------------------------------------------------------------------
+// Die Ideenliste (Taste i)
+// ---------------------------------------------------------------------------
+
+// Was Leopold geparkt hat, steht in SPIELSTAND.md — derselben Datei, die die KI
+// zwischen den Sessions liest. Hier wird sie nur angezeigt, nie geschrieben.
+
+const ideenLayer = document.getElementById("ideen");
+const ideenNaechstes = ideenLayer.querySelector(".naechstes");
+const ideenListe = ideenLayer.querySelector("ul");
+const ideenLeer = ideenLayer.querySelector(".leer");
+
+let ideenOffen = false;
+let letzterStand = "";
+
+// Alles zwischen "## <name>" und der nächsten Überschrift. Der Parser darf so
+// naiv sein, weil nur die KI in die Datei schreibt.
+function abschnitt(text, name) {
+  const teil = text.split(/^## +/m).find((t) => t.startsWith(name));
+  return teil ? teil.slice(name.length).trim() : "";
+}
+
+// "- [x] Flauschi kann fliegen" → { fertig: true, text: "Flauschi kann fliegen" }
+function punkte(roh) {
+  return roh
+    .split("\n")
+    .map((zeile) => zeile.trim())
+    .filter((zeile) => zeile.startsWith("- "))
+    .map((zeile) => zeile.slice(2).trim())
+    .map((zeile) => ({
+      fertig: /^\[x\]/i.test(zeile),
+      text: zeile.replace(/^\[[ x]\] */i, ""),
+    }));
+}
+
+function ideenZeigen(text) {
+  const naechstes = abschnitt(text, "Nächstes Mal")
+    .split("\n")[0]
+    .replace(/^- */, "")
+    .trim();
+  ideenNaechstes.textContent = `Nächstes Mal: ${naechstes}`;
+  ideenNaechstes.hidden = !naechstes;
+
+  // Offenes zuerst. Gebautes bleibt abgehakt stehen — es ist der sichtbare
+  // Beweis, dass seine Ideen ankommen —, aber nicht im Weg.
+  const alle = punkte(abschnitt(text, "Ideenliste"));
+  const sortiert = [...alle.filter((p) => !p.fertig), ...alle.filter((p) => p.fertig)];
+
+  ideenListe.replaceChildren(
+    ...sortiert.map(({ fertig, text }) => {
+      const zeile = document.createElement("li");
+      zeile.textContent = text;
+      if (fertig) zeile.className = "fertig";
+      return zeile;
+    }),
+  );
+  ideenLeer.hidden = sortiert.length > 0;
+}
+
+// Bei jedem Öffnen neu lesen: was gerade eben geparkt wurde, soll sofort
+// dastehen. Der Zeitstempel umgeht denselben Pages-Cache wie in index.html.
+async function ideenLaden() {
+  try {
+    const antwort = await fetch(`./SPIELSTAND.md?stand=${Date.now()}`);
+    if (!antwort.ok) return;
+    letzterStand = await antwort.text();
+    if (ideenOffen) ideenZeigen(letzterStand);
+  } catch {
+    // Keine Verbindung, keine Datei — dann bleibt der letzte Stand stehen.
+    // Am Lesen der Liste darf das Spiel nicht sterben.
+  }
+}
+
+function ideenUmschalten(offen) {
+  ideenOffen = offen;
+  ideenLayer.hidden = !offen;
+  gedrueckt.clear(); // in beide Richtungen: keine Taste soll das Lesen überdauern
+  if (!offen) return;
+  ideenZeigen(letzterStand);
+  ideenLaden();
+}
+
+// Eigener Listener, damit die Steuerung oben unberührt bleibt. Zum Schließen
+// tut es auch ein Klick — die naheliegendste Geste, wenn man weiterspielen will.
+addEventListener("keydown", (e) => {
+  if (taste(e) === "i") ideenUmschalten(!ideenOffen);
+  else if (e.key === "Escape") ideenUmschalten(false);
+});
+ideenLayer.addEventListener("pointerdown", () => ideenUmschalten(false));
+
+ideenUmschalten(false); // Startzustand aus dem Code, nicht bloß aus dem hidden im HTML
+ideenLaden(); // die Liste steht bereit, bevor er das erste Mal i drückt
+
+// ---------------------------------------------------------------------------
 // Die Zeichenfläche füllt immer das ganze Fenster
 // ---------------------------------------------------------------------------
 
@@ -77,6 +170,8 @@ figur.y = innerHeight / 2;
 // ---------------------------------------------------------------------------
 
 function bewegen(sekunden) {
+  if (ideenOffen) return; // beim Lesen der Liste steht die Figur still
+
   let xRichtung = 0;
   let yRichtung = 0;
 
