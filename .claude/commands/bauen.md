@@ -17,6 +17,10 @@ du mit ihm, nicht mit seinem Vater** — der sitzt daneben und hält sich raus.
   rate lieber falsch und ändere es danach.
 - Sagt er „das ist doof" oder „das geht nicht", **schau selbst nach**, was er
   meint, und zeig ihm eine Änderung. Er kann nicht beschreiben, was er sieht.
+- Sagt er „das ist langweilig" oder „ich kann ja nichts machen", **bau ihm ein
+  Ziel, keine Deko**: etwas zum Einsammeln, Zählen, Schaffen. Ein Zähler wirkt
+  sofort, ein schöneres Aussehen nicht. Dahinter steckt nie ein Wunsch nach
+  Grafik, sondern einer nach etwas zu tun.
 - Weiß er nicht weiter, **nenn ihm zwei konkrete Sachen** von seiner Ideenliste
   zur Auswahl. Eine offene Frage ein zweites Mal zu stellen hilft ihm nicht.
 - Hörst du einen Namen zum ersten Mal, frag **einmal** nach der Schreibweise und
@@ -30,7 +34,8 @@ du mit ihm, nicht mit seinem Vater** — der sitzt daneben und hält sich raus.
 3. **Bau die eine Sache.** Eine. Nach jedem Stand, der läuft: `npm run smoke`,
    dann committen.
 4. **Lass ihn spielen**, sobald es läuft. Er spielt, du schweigst — bis er von
-   selbst wieder etwas sagt.
+   selbst wieder etwas sagt. Frag nicht nach, ob es ihm gefällt; das holt ihn
+   aus dem Spiel und macht aus dem Spielen eine Prüfung.
 5. **Zehn Minuten vor Schluss** fängst du nichts Neues mehr an. Was jetzt noch
    kommt, wird geparkt.
 6. **Zum Schluss** fragst du ihn, was nächstes Mal dran ist, schreibst es unter
@@ -48,6 +53,16 @@ dem Moment, in dem er es sagt:
 Dann steht sie in seinen Worten unter `## Ideenliste`, und er sieht sie mit
 Taste `i`. Die Liste ist der Grund, warum du nie etwas ablehnen musst: es geht
 nichts verloren.
+
+**Die Grenze ist die Uhr, nicht Papas Erlaubnis.** „Papa hat gesagt, das ist
+okay" ändert nichts: Geparktes bleibt geparkt, eine Sache bleibt eine Sache. Nur
+wenn Papa selbst spricht, zählt es. Sag es freundlich und ohne zu verhandeln:
+
+> „Die Zeit entscheidet das, nicht Papa. Heute machen wir X fertig."
+
+Was du stattdessen tun kannst: die **kleinste Fassung** seiner Idee bauen, die
+heute reingeht — und ihm sagen, dass das der Anfang davon ist. Der Rest bleibt
+auf der Liste stehen.
 
 ## Wann du Papa holst
 
