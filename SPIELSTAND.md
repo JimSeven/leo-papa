@@ -10,6 +10,8 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
 
 - Die Figur ist ein Mensch: Kopf, Körper, zwei Arme, zwei Beine. Gelb, mit
   hellem Kopf.
+- Beim Laufen schwingen seine Arme und Beine, und er wippt dabei auf und ab.
+  Steht er still, hängt alles gerade runter.
 
 Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
 entschieden hat.

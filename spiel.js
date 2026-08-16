@@ -284,7 +284,15 @@ figur.y = innerHeight / 2;
 // Was in jedem Bild passiert
 // ---------------------------------------------------------------------------
 
+// Solange er läuft, tickt `laufZeit` weiter — daraus entstehen die Schritte in
+// `menschZeichnen`. Bleibt er stehen, wird sie nicht zurückgesetzt: beim
+// nächsten Losgehen macht er dort weiter, statt zu zucken.
+const SCHRITTE_PRO_SEKUNDE = 1.6;
+let laufZeit = 0;
+let laeuft = false;
+
 function bewegen(sekunden) {
+  laeuft = false;
   if (ideenOffen) return; // beim Lesen der Liste steht die Figur still
 
   let xRichtung = 0;
@@ -310,6 +318,8 @@ function bewegen(sekunden) {
 
   if (xRichtung === 0 && yRichtung === 0) return;
   schonBewegt = true;
+  laeuft = true;
+  laufZeit += sekunden;
 
   // Schräg soll nicht schneller sein als gerade.
   const laenge = Math.hypot(xRichtung, yRichtung);
@@ -327,12 +337,20 @@ function bewegen(sekunden) {
 // hängen an `figur.groesse` — wird die größer, wächst er mit.
 function menschZeichnen(x, y) {
   const hoch = figur.groesse;
+  // Der Schritt: -1 heißt linkes Bein vorn, +1 rechtes. Steht er still, ist er
+  // 0 und alles hängt gerade runter.
+  const schritt = laeuft ? Math.sin(laufZeit * SCHRITTE_PRO_SEKUNDE * Math.PI * 2) : 0;
+  const wippen = Math.abs(schritt) * hoch * 0.03; // beim Schritt sackt er kurz ab
+
+  y += wippen;
   const oben = y - hoch / 2; // hier fängt der Kopf an
   const kopf = hoch * 0.22; // Größe vom Kopf
   const strich = Math.max(3, hoch * 0.1); // wie dick die Arme und Beine sind
 
   const schulter = oben + kopf * 2; // wo die Arme dranhängen
   const huefte = oben + hoch * 0.62; // wo die Beine anfangen
+
+  const ausschlag = hoch * 0.16 * schritt; // so weit gehen Arme und Beine vor
 
   // Kopf
   stift.fillStyle = figur.hautfarbe;
@@ -349,13 +367,14 @@ function menschZeichnen(x, y) {
   stift.moveTo(x, oben + kopf * 2); // Hals
   stift.lineTo(x, huefte); // Bauch
 
-  stift.moveTo(x - hoch * 0.25, schulter + hoch * 0.12); // linke Hand
+  // Arme und Beine gehen gegengleich: rechter Arm vor, linkes Bein vor.
+  stift.moveTo(x - hoch * 0.25 - ausschlag, schulter + hoch * 0.12); // linke Hand
   stift.lineTo(x, schulter);
-  stift.lineTo(x + hoch * 0.25, schulter + hoch * 0.12); // rechte Hand
+  stift.lineTo(x + hoch * 0.25 + ausschlag, schulter + hoch * 0.12); // rechte Hand
 
-  stift.moveTo(x - hoch * 0.18, y + hoch / 2); // linker Fuß
+  stift.moveTo(x - hoch * 0.18 + ausschlag, y + hoch / 2); // linker Fuß
   stift.lineTo(x, huefte);
-  stift.lineTo(x + hoch * 0.18, y + hoch / 2); // rechter Fuß
+  stift.lineTo(x + hoch * 0.18 - ausschlag, y + hoch / 2); // rechter Fuß
   stift.stroke();
 }
 
