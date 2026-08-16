@@ -49,6 +49,10 @@ entschieden hat.
 - [x] Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
 - Eine Mine neben dem Labyrinth, wo man mit der Spitzhacke Geld verdienen kann
 - [x] Ein Sandplatz mit ein paar Häusern (der Anfang — kaufen geht noch nicht)
+- Die Zombies sollen mir Schaden zufügen können
+- In die Häuser reingehen können
 - In den Häusern auf dem Sandplatz was kaufen können
 
 ## Nächstes Mal
+
+- Die Zombies sollen mir Schaden zufügen können
