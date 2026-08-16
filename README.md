@@ -1,5 +1,7 @@
 # Leopolds Spiel
 
+**Leopolds Version zum Spielen: https://jimseven.github.io/leo-papa/**
+
 ## Loslegen
 
 ```
@@ -15,6 +17,16 @@ Jede Änderung an `spiel.js` oder `index.html` lädt die Seite sofort neu.
 ```
 npm run smoke
 ```
+
+## Veröffentlichen
+
+```
+git push
+```
+
+Committen ist nur für uns, **pushen ist das Veröffentlichen** — was gepusht ist,
+kann Leopold spielen. Der Push gehört ans Session-Ende, als sichtbarer Abschluss.
+Die neue Version steht nach etwa einer Minute unter der URL oben.
 
 ## Wo was steht
 

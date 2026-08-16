@@ -16,10 +16,16 @@ ADHS ist Randbedingung, nicht Thema. Kein Therapiespiel — aber bewusst gegen a
 
 1. **Kurze Runde:** Was soll heute anders sein?
 2. **Eine Sache bauen.** Eine.
-3. **Er spielt allein**, was gerade entstanden ist.
-4. **Festlegen**, was nächstes Mal dran ist.
+3. **Veröffentlichen** — `git push`. Danach steht die neue Version für Leopold bereit.
+4. **Er spielt allein**, was gerade entstanden ist.
+5. **Festlegen**, was nächstes Mal dran ist.
 
-Am Ende jeder Session existiert eine Version, die er ohne Papa spielen kann.
+Am Ende jeder Session existiert eine Version, die er ohne Papa spielen kann:
+**https://jimseven.github.io/leo-papa/**
+
+Der Push ist der bewusste Abschluss — committen ist nur für uns, pushen ist das
+Veröffentlichen. *(revidierbar: falls sich das Warten auf den Build zäh anfühlt,
+kann die Veröffentlichung auch automatisch bei jedem Commit laufen)*
 
 ## Wer macht was
 
