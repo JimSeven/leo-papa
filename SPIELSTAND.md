@@ -12,6 +12,8 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   hellem Kopf.
 - Beim Laufen schwingen seine Arme und Beine, und er wippt dabei auf und ab.
   Steht er still, hängt alles gerade runter.
+- Er ist ein Cowboy: brauner Cowboy-Hut auf dem Kopf, Pistole in der rechten
+  Hand. Die Pistole schwingt beim Laufen mit dem Arm mit.
 
 Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
 entschieden hat.
@@ -21,5 +23,7 @@ entschieden hat.
 *Noch keine.*
 
 ## Ideenliste
+
+- Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
 
 ## Nächstes Mal

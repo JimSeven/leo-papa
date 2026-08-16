@@ -17,6 +17,8 @@ const figur = {
   groesse: 60, // so hoch ist der Mensch von Kopf bis Fuß
   farbe: "#ffd23f", // dieselbe Farbe steckt auch in favicon.svg
   hautfarbe: "#f3c58c",
+  hutfarbe: "#8b5a2b",
+  pistolenfarbe: "#c9ced8",
   tempo: 420, // Pixel pro Sekunde
 };
 
@@ -358,6 +360,16 @@ function menschZeichnen(x, y) {
   stift.arc(x, oben + kopf, kopf, 0, Math.PI * 2);
   stift.fill();
 
+  // Der Cowboy-Hut: eine breite Krempe und eine runde Kuppel darauf.
+  const krempe = oben + kopf * 0.55; // auf dieser Höhe sitzt der Hut
+  stift.fillStyle = figur.hutfarbe;
+  stift.beginPath();
+  stift.ellipse(x, krempe, kopf * 1.7, kopf * 0.35, 0, 0, Math.PI * 2);
+  stift.fill();
+  stift.beginPath();
+  stift.ellipse(x, krempe, kopf * 0.85, kopf * 0.9, 0, Math.PI, Math.PI * 2);
+  stift.fill();
+
   // Körper, Arme und Beine
   stift.strokeStyle = figur.farbe;
   stift.lineWidth = strich;
@@ -376,6 +388,20 @@ function menschZeichnen(x, y) {
   stift.lineTo(x, huefte);
   stift.lineTo(x + hoch * 0.18 - ausschlag, y + hoch / 2); // rechter Fuß
   stift.stroke();
+
+  // Die Pistole hält er in der rechten Hand — sie wandert also mit, wenn der
+  // Arm beim Laufen schwingt.
+  pistoleZeichnen(x + hoch * 0.25 + ausschlag, schulter + hoch * 0.12, hoch);
+}
+
+// Lauf nach vorn, Griff nach unten.
+function pistoleZeichnen(x, y, hoch) {
+  const lang = hoch * 0.26;
+  const dick = hoch * 0.08;
+
+  stift.fillStyle = figur.pistolenfarbe;
+  stift.fillRect(x, y - dick / 2, lang, dick); // der Lauf
+  stift.fillRect(x + dick * 0.2, y + dick / 2, dick * 0.8, dick * 1.4); // der Griff
 }
 
 function zeichnen() {
