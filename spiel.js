@@ -14,8 +14,9 @@ const stift = bild.getContext("2d");
 const figur = {
   x: 0, // wird beim Start in die Mitte gesetzt
   y: 0,
-  groesse: 60,
+  groesse: 60, // so hoch ist der Mensch von Kopf bis Fuß
   farbe: "#ffd23f", // dieselbe Farbe steckt auch in favicon.svg
+  hautfarbe: "#f3c58c",
   tempo: 420, // Pixel pro Sekunde
 };
 
@@ -322,13 +323,47 @@ function bewegen(sekunden) {
   figur.y = Math.min(Math.max(figur.y, halb), innerHeight - halb);
 }
 
+// Der Mensch wird aus lauter kleinen Strichen und einem Kreis gebaut. Alle Maße
+// hängen an `figur.groesse` — wird die größer, wächst er mit.
+function menschZeichnen(x, y) {
+  const hoch = figur.groesse;
+  const oben = y - hoch / 2; // hier fängt der Kopf an
+  const kopf = hoch * 0.22; // Größe vom Kopf
+  const strich = Math.max(3, hoch * 0.1); // wie dick die Arme und Beine sind
+
+  const schulter = oben + kopf * 2; // wo die Arme dranhängen
+  const huefte = oben + hoch * 0.62; // wo die Beine anfangen
+
+  // Kopf
+  stift.fillStyle = figur.hautfarbe;
+  stift.beginPath();
+  stift.arc(x, oben + kopf, kopf, 0, Math.PI * 2);
+  stift.fill();
+
+  // Körper, Arme und Beine
+  stift.strokeStyle = figur.farbe;
+  stift.lineWidth = strich;
+  stift.lineCap = "round";
+
+  stift.beginPath();
+  stift.moveTo(x, oben + kopf * 2); // Hals
+  stift.lineTo(x, huefte); // Bauch
+
+  stift.moveTo(x - hoch * 0.25, schulter + hoch * 0.12); // linke Hand
+  stift.lineTo(x, schulter);
+  stift.lineTo(x + hoch * 0.25, schulter + hoch * 0.12); // rechte Hand
+
+  stift.moveTo(x - hoch * 0.18, y + hoch / 2); // linker Fuß
+  stift.lineTo(x, huefte);
+  stift.lineTo(x + hoch * 0.18, y + hoch / 2); // rechter Fuß
+  stift.stroke();
+}
+
 function zeichnen() {
   stift.fillStyle = HINTERGRUND;
   stift.fillRect(0, 0, innerWidth, innerHeight);
 
-  const halb = figur.groesse / 2;
-  stift.fillStyle = figur.farbe;
-  stift.fillRect(figur.x - halb, figur.y - halb, figur.groesse, figur.groesse);
+  menschZeichnen(figur.x, figur.y);
 
   stift.font = "24px system-ui, sans-serif";
   stift.textAlign = "center";

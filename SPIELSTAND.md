@@ -8,8 +8,11 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
 
 ## So ist das Spiel
 
-*Noch nichts.* Das gelbe Quadrat, seine Größe und sein Tempo sind Platzhalter —
-sie stehen hier erst, wenn Leopold sie entschieden hat.
+- Die Figur ist ein Mensch: Kopf, Körper, zwei Arme, zwei Beine. Gelb, mit
+  hellem Kopf.
+
+Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
+entschieden hat.
 
 ## Wörter
 
