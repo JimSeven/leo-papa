@@ -351,9 +351,9 @@ function zellenMitte(c, z) {
   };
 }
 
-function stecktInMauer(x, y) {
+function stecktInMauer(x, y, rand = PLATZ) {
   return labyrinth.mauern.some(
-    (m) => x + PLATZ > m.x && x - PLATZ < m.x + m.b && y + PLATZ > m.y && y - PLATZ < m.y + m.h,
+    (m) => x + rand > m.x && x - rand < m.x + m.b && y + rand > m.y && y - rand < m.y + m.h,
   );
 }
 
@@ -408,6 +408,54 @@ const SCHRITTE_PRO_SEKUNDE = 1.6;
 let laufZeit = 0;
 let laeuft = false;
 
+// Wohin er guckt. Steht er still, bleibt die letzte Richtung stehen — dorthin
+// geht auch der Schuss. Am Anfang guckt er nach rechts.
+let blick = { x: 1, y: 0 };
+
+// ---------------------------------------------------------------------------
+// Schießen (Leertaste)
+// ---------------------------------------------------------------------------
+
+const KUGEL_TEMPO = 900; // Pixel pro Sekunde
+const KUGEL_GROESSE = 5;
+const NACHLADEN = 0.22; // so lange dauert es bis zum nächsten Schuss
+
+const kugeln = [];
+let nachladenBis = 0;
+
+function schiessen() {
+  const jetzt = performance.now() / 1000;
+  if (ideenOffen || jetzt < nachladenBis) return;
+  nachladenBis = jetzt + NACHLADEN;
+
+  // Die Kugel kommt aus der Pistole, nicht aus der Mitte des Cowboys.
+  kugeln.push({
+    x: figur.x + blick.x * figur.groesse * 0.45,
+    y: figur.y + blick.y * figur.groesse * 0.45 - figur.groesse * 0.05,
+    dx: blick.x,
+    dy: blick.y,
+  });
+}
+
+function kugelnBewegen(sekunden) {
+  for (let i = kugeln.length - 1; i >= 0; i--) {
+    const kugel = kugeln[i];
+    kugel.x += kugel.dx * KUGEL_TEMPO * sekunden;
+    kugel.y += kugel.dy * KUGEL_TEMPO * sekunden;
+
+    // An der Wand ist Schluss — und außerhalb des Fensters erst recht.
+    const raus = kugel.x < 0 || kugel.y < 0 || kugel.x > innerWidth || kugel.y > innerHeight;
+    if (raus || stecktInMauer(kugel.x, kugel.y, KUGEL_GROESSE)) kugeln.splice(i, 1);
+  }
+}
+
+addEventListener("keydown", (e) => {
+  if (e.key === " ") {
+    e.preventDefault(); // die Leertaste soll die Seite nicht scrollen
+    schiessen();
+  }
+});
+
 function bewegen(sekunden) {
   laeuft = false;
   if (ideenOffen) return; // beim Lesen der Liste steht die Figur still
@@ -431,6 +479,9 @@ function bewegen(sekunden) {
     const vomStick = controllerRichtung(pad);
     xRichtung += vomStick.x;
     yRichtung += vomStick.y;
+
+    // Am Controller wird mit dem unteren Knopf geschossen (A bzw. X).
+    if (pad.buttons[0]?.pressed) schiessen();
   }
 
   if (xRichtung === 0 && yRichtung === 0) return;
@@ -440,13 +491,29 @@ function bewegen(sekunden) {
 
   // Schräg soll nicht schneller sein als gerade.
   const laenge = Math.hypot(xRichtung, yRichtung);
+  blick = { x: xRichtung / laenge, y: yRichtung / laenge };
+
   const strecke = figur.tempo * sekunden;
-  verschieben((xRichtung / laenge) * strecke, (yRichtung / laenge) * strecke);
+  verschieben(blick.x * strecke, blick.y * strecke);
 }
 
 // Der Mensch wird aus lauter kleinen Strichen und einem Kreis gebaut. Alle Maße
 // hängen an `figur.groesse` — wird die größer, wächst er mit.
 function menschZeichnen(x, y) {
+  // Läuft er nach links, wird alles gespiegelt — sonst würde die Pistole in
+  // die falsche Richtung zeigen.
+  if (blick.x < 0) {
+    stift.save();
+    stift.translate(x * 2, 0);
+    stift.scale(-1, 1);
+    menschGespiegeltZeichnen(x, y);
+    stift.restore();
+    return;
+  }
+  menschGespiegeltZeichnen(x, y);
+}
+
+function menschGespiegeltZeichnen(x, y) {
   const hoch = figur.groesse;
   // Der Schritt: -1 heißt linkes Bein vorn, +1 rechtes. Steht er still, ist er
   // 0 und alles hängt gerade runter.
@@ -522,6 +589,13 @@ function zeichnen() {
 
   menschZeichnen(figur.x, figur.y);
 
+  stift.fillStyle = "#fff6c2";
+  for (const kugel of kugeln) {
+    stift.beginPath();
+    stift.arc(kugel.x, kugel.y, KUGEL_GROESSE, 0, Math.PI * 2);
+    stift.fill();
+  }
+
   stift.font = "24px system-ui, sans-serif";
   stift.textAlign = "center";
   stift.textBaseline = "alphabetic";
@@ -542,6 +616,7 @@ function schleife(jetzt) {
   vorherigeZeit = jetzt;
 
   bewegen(sekunden);
+  kugelnBewegen(sekunden);
   zeichnen();
   diagnoseZeichnen();
 
