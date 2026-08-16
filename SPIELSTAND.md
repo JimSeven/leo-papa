@@ -14,9 +14,12 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   Steht er still, hängt alles gerade runter.
 - Er ist ein Cowboy: brauner Cowboy-Hut auf dem Kopf, Pistole in der rechten
   Hand. Die Pistole schwingt beim Laufen mit dem Arm mit.
-- Mit der Leertaste schießt er (am Controller der untere Knopf). Die Kugel
-  fliegt dorthin, wo er zuletzt hingelaufen ist, und bleibt an der Wand liegen.
-  Läuft er nach links, dreht er sich mitsamt Pistole um.
+- Gelaufen wird mit den Pfeiltasten, geschossen mit **W A S D** — jede Taste in
+  ihre Richtung. So kann er in eine Richtung laufen und in eine andere
+  schießen. Die Leertaste schießt geradeaus dorthin, wo er hinguckt (am
+  Controller der untere Knopf).
+- Die Kugel bleibt an der Wand liegen. Schießt oder läuft er nach links, dreht
+  er sich mitsamt Pistole um.
 - Er läuft durch ein Labyrinth. Durch die Wände kommt er nicht durch, aber
   jede Ecke ist erreichbar. Er startet oben links, und bei jedem Neuladen ist
   das Labyrinth anders.

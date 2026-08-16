@@ -28,12 +28,16 @@ const HINTERGRUND = "#10131a";
 // So wird gesteuert
 // ---------------------------------------------------------------------------
 
+// Zwei Hände, zwei Aufgaben: die Pfeiltasten laufen, W A S D schießen.
 // Schlüssel durchgehend klein — siehe `taste()` weiter unten.
 const RICHTUNGEN = {
   arrowleft: [-1, 0],
   arrowright: [1, 0],
   arrowup: [0, -1],
   arrowdown: [0, 1],
+};
+
+const SCHUSS_TASTEN = {
   a: [-1, 0],
   d: [1, 0],
   w: [0, -1],
@@ -423,18 +427,37 @@ const NACHLADEN = 0.22; // so lange dauert es bis zum nächsten Schuss
 const kugeln = [];
 let nachladenBis = 0;
 
-function schiessen() {
+// Ohne Richtung schießt er dahin, wo er gerade hinguckt.
+function schiessen(richtung = blick) {
   const jetzt = performance.now() / 1000;
   if (ideenOffen || jetzt < nachladenBis) return;
   nachladenBis = jetzt + NACHLADEN;
 
+  const laenge = Math.hypot(richtung.x, richtung.y) || 1;
+  const dx = richtung.x / laenge;
+  const dy = richtung.y / laenge;
+  blick = { x: dx, y: dy }; // er dreht sich dahin, wo er hinschießt
+
   // Die Kugel kommt aus der Pistole, nicht aus der Mitte des Cowboys.
   kugeln.push({
-    x: figur.x + blick.x * figur.groesse * 0.45,
-    y: figur.y + blick.y * figur.groesse * 0.45 - figur.groesse * 0.05,
-    dx: blick.x,
-    dy: blick.y,
+    x: figur.x + dx * figur.groesse * 0.45,
+    y: figur.y + dy * figur.groesse * 0.45 - figur.groesse * 0.05,
+    dx,
+    dy,
   });
+}
+
+// Gedrückt halten schießt weiter — der Rhythmus kommt vom Nachladen.
+function schussTastenPruefen() {
+  let x = 0;
+  let y = 0;
+  for (const taste of gedrueckt) {
+    const richtung = SCHUSS_TASTEN[taste];
+    if (!richtung) continue;
+    x += richtung[0];
+    y += richtung[1];
+  }
+  if (x !== 0 || y !== 0) schiessen({ x, y });
 }
 
 function kugelnBewegen(sekunden) {
@@ -605,7 +628,7 @@ function zeichnen() {
     stift.fillText("Controller ist da!", innerWidth / 2, innerHeight - 60);
   } else if (!schonBewegt) {
     stift.fillStyle = "#7d8598";
-    stift.fillText("Drück die Pfeiltasten", innerWidth / 2, innerHeight - 60);
+    stift.fillText("Pfeiltasten laufen — W A S D schießen", innerWidth / 2, innerHeight - 60);
   }
 }
 
@@ -616,6 +639,7 @@ function schleife(jetzt) {
   vorherigeZeit = jetzt;
 
   bewegen(sekunden);
+  schussTastenPruefen();
   kugelnBewegen(sekunden);
   zeichnen();
   diagnoseZeichnen();
