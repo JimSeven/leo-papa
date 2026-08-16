@@ -22,6 +22,10 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   Knopf schießt geradeaus.
 - Die Kugel bleibt an der Wand liegen. Schießt oder läuft er nach links, dreht
   er sich mitsamt Pistole um.
+- Im Labyrinth sind sechs grüne Zombies mit vorgestreckten Armen. Sie schlurfen
+  stur auf den Cowboy zu, sind aber langsamer als er — weglaufen geht immer.
+- Eine Kugel erledigt einen Zombie, und woanders taucht ein neuer auf. Oben
+  links steht, wie viele er abgeballert hat.
 - Er läuft durch ein Labyrinth. Durch die Wände kommt er nicht durch, aber
   jede Ecke ist erreichbar. Er startet oben links, und bei jedem Neuladen ist
   das Labyrinth anders.

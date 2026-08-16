@@ -375,11 +375,124 @@ function stecktInMauer(x, y, rand = PLATZ) {
   );
 }
 
-// Erst nach links/rechts, dann nach oben/unten — getrennt. So bleibt er an
-// einer Wand nicht kleben, sondern rutscht an ihr entlang weiter.
-function verschieben(dx, dy) {
-  if (!stecktInMauer(figur.x + dx, figur.y)) figur.x += dx;
-  if (!stecktInMauer(figur.x, figur.y + dy)) figur.y += dy;
+// Erst nach links/rechts, dann nach oben/unten — getrennt. So bleibt wer auch
+// immer sich bewegt an einer Wand nicht kleben, sondern rutscht an ihr entlang
+// weiter.
+function verschieben(wer, dx, dy) {
+  if (!stecktInMauer(wer.x + dx, wer.y)) wer.x += dx;
+  if (!stecktInMauer(wer.x, wer.y + dy)) wer.y += dy;
+}
+
+// ---------------------------------------------------------------------------
+// Die Zombies
+// ---------------------------------------------------------------------------
+
+// Sie sind langsamer als der Cowboy — weglaufen geht also immer. Sie laufen
+// stur auf ihn zu und bleiben dabei an Wänden hängen; das Labyrinth ist ihr
+// Problem, nicht ihre Fähigkeit.
+
+const ZOMBIE_TEMPO = 95; // Pixel pro Sekunde, deutlich langsamer als der Cowboy
+const ZOMBIE_ANZAHL = 6;
+const ZOMBIE_GROESSE = 54;
+const ZOMBIE_PLATZ = 20;
+const SICHERHEITSABSTAND = 260; // so weit weg vom Cowboy tauchen sie auf
+
+const zombies = [];
+let abgeballert = 0;
+
+// Ein freier Platz irgendwo im Labyrinth, weit genug weg vom Cowboy.
+function freierPlatz() {
+  for (let versuch = 0; versuch < 200; versuch++) {
+    const c = Math.floor(Math.random() * labyrinth.spalten);
+    const z = Math.floor(Math.random() * labyrinth.zeilen);
+    const mitte = zellenMitte(c, z);
+    if (Math.hypot(mitte.x - figur.x, mitte.y - figur.y) < SICHERHEITSABSTAND) continue;
+    return mitte;
+  }
+  // Sehr kleines Labyrinth: dann eben irgendwo.
+  return zellenMitte(labyrinth.spalten - 1, labyrinth.zeilen - 1);
+}
+
+function zombieDazu() {
+  const platz = freierPlatz();
+  zombies.push({ x: platz.x, y: platz.y, wackeln: Math.random() * 10 });
+}
+
+function zombiesNeu() {
+  zombies.length = 0;
+  for (let i = 0; i < ZOMBIE_ANZAHL; i++) zombieDazu();
+}
+
+function zombiesBewegen(sekunden) {
+  if (ideenOffen) return; // beim Lesen der Liste steht auch bei ihnen alles still
+
+  for (const zombie of zombies) {
+    zombie.wackeln += sekunden;
+
+    const dx = figur.x - zombie.x;
+    const dy = figur.y - zombie.y;
+    const laenge = Math.hypot(dx, dy) || 1;
+    const strecke = ZOMBIE_TEMPO * sekunden;
+    verschieben(zombie, (dx / laenge) * strecke, (dy / laenge) * strecke);
+  }
+}
+
+// Trifft eine Kugel einen Zombie, sind beide weg — und ein neuer Zombie taucht
+// woanders auf, damit es nie leer wird.
+function treffer() {
+  for (let k = kugeln.length - 1; k >= 0; k--) {
+    const kugel = kugeln[k];
+    const getroffen = zombies.findIndex(
+      (z) => Math.hypot(z.x - kugel.x, z.y - kugel.y) < ZOMBIE_PLATZ + KUGEL_GROESSE,
+    );
+    if (getroffen === -1) continue;
+
+    zombies.splice(getroffen, 1);
+    kugeln.splice(k, 1);
+    abgeballert++;
+    zombieDazu();
+  }
+}
+
+// Wie der Cowboy, nur grün, ohne Hut und mit vorgestreckten Armen. Er schlurft,
+// statt zu schwingen — daher das Wackeln um die eigene Achse.
+function zombieZeichnen(zombie) {
+  const hoch = ZOMBIE_GROESSE;
+  const kippen = Math.sin(zombie.wackeln * 3) * 0.12;
+
+  stift.save();
+  stift.translate(zombie.x, zombie.y);
+  stift.rotate(kippen);
+
+  const oben = -hoch / 2;
+  const kopf = hoch * 0.22;
+  const schulter = oben + kopf * 2;
+  const huefte = oben + hoch * 0.62;
+
+  stift.fillStyle = "#9bd15b";
+  stift.beginPath();
+  stift.arc(0, oben + kopf, kopf, 0, Math.PI * 2);
+  stift.fill();
+
+  stift.strokeStyle = "#5d8f2f";
+  stift.lineWidth = Math.max(3, hoch * 0.1);
+  stift.lineCap = "round";
+
+  stift.beginPath();
+  stift.moveTo(0, oben + kopf * 2);
+  stift.lineTo(0, huefte);
+
+  // Beide Arme nach vorn — daran erkennt man einen Zombie.
+  stift.moveTo(-hoch * 0.3, schulter - hoch * 0.06);
+  stift.lineTo(0, schulter);
+  stift.lineTo(hoch * 0.3, schulter - hoch * 0.06);
+
+  stift.moveTo(-hoch * 0.16, hoch / 2);
+  stift.lineTo(0, huefte);
+  stift.lineTo(hoch * 0.16, hoch / 2);
+  stift.stroke();
+
+  stift.restore();
 }
 
 // ---------------------------------------------------------------------------
@@ -403,6 +516,7 @@ addEventListener("resize", () => {
   flaecheAnpassen();
   labyrinthBauen();
   anDenAnfang();
+  zombiesNeu();
 });
 
 function anDenAnfang() {
@@ -414,6 +528,7 @@ function anDenAnfang() {
 flaecheAnpassen();
 labyrinthBauen();
 anDenAnfang();
+zombiesNeu();
 
 // ---------------------------------------------------------------------------
 // Was in jedem Bild passiert
@@ -538,7 +653,7 @@ function bewegen(sekunden) {
   blick = { x: xRichtung / laenge, y: yRichtung / laenge };
 
   const strecke = figur.tempo * sekunden;
-  verschieben(blick.x * strecke, blick.y * strecke);
+  verschieben(figur, blick.x * strecke, blick.y * strecke);
 }
 
 // Der Mensch wird aus lauter kleinen Strichen und einem Kreis gebaut. Alle Maße
@@ -631,6 +746,8 @@ function zeichnen() {
   stift.fillStyle = MAUERFARBE;
   for (const m of labyrinth.mauern) stift.fillRect(m.x, m.y, m.b, m.h);
 
+  for (const zombie of zombies) zombieZeichnen(zombie);
+
   menschZeichnen(figur.x, figur.y);
 
   stift.fillStyle = "#fff6c2";
@@ -639,6 +756,13 @@ function zeichnen() {
     stift.arc(kugel.x, kugel.y, KUGEL_GROESSE, 0, Math.PI * 2);
     stift.fill();
   }
+
+  // Der Zähler: was er geschafft hat, steht immer oben links.
+  stift.font = "bold 26px system-ui, sans-serif";
+  stift.textAlign = "left";
+  stift.textBaseline = "top";
+  stift.fillStyle = "#9bd15b";
+  stift.fillText(`Zombies abgeballert: ${abgeballert}`, 18, 14);
 
   stift.font = "24px system-ui, sans-serif";
   stift.textAlign = "center";
@@ -662,6 +786,8 @@ function schleife(jetzt) {
   bewegen(sekunden);
   schussTastenPruefen();
   kugelnBewegen(sekunden);
+  zombiesBewegen(sekunden);
+  treffer();
   zeichnen();
   diagnoseZeichnen();
 
