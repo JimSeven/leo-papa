@@ -13,7 +13,9 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
 - Beim Laufen schwingen seine Arme und Beine, und er wippt dabei auf und ab.
   Steht er still, hängt alles gerade runter.
 - Er ist ein Cowboy: brauner Cowboy-Hut auf dem Kopf, Pistole in der rechten
-  Hand. Die Pistole schwingt beim Laufen mit dem Arm mit.
+  Hand, Spitzhacke über der linken Schulter. Beide schwingen beim Laufen mit
+  den Armen mit. Zum Graben ist die Spitzhacke noch nicht da — die Mine steht
+  auf der Ideenliste.
 - Gelaufen wird mit den Pfeiltasten, geschossen mit **W A S D** — jede Taste in
   ihre Richtung. So kann er in eine Richtung laufen und in eine andere
   schießen. Die Leertaste schießt geradeaus dorthin, wo er hinguckt.
@@ -43,5 +45,7 @@ entschieden hat.
 ## Ideenliste
 
 - [x] Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
+- Eine Mine neben dem Labyrinth, wo man mit der Spitzhacke Geld verdienen kann
+- Ein Sandplatz mit ein paar Häusern, wo man sich was kaufen kann
 
 ## Nächstes Mal

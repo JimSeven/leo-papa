@@ -19,6 +19,7 @@ const figur = {
   hautfarbe: "#f3c58c",
   hutfarbe: "#8b5a2b",
   pistolenfarbe: "#c9ced8",
+  stielfarbe: "#a9743d",
   tempo: 420, // Pixel pro Sekunde
 };
 
@@ -760,9 +761,33 @@ function menschGespiegeltZeichnen(x, y) {
   stift.lineTo(x + hoch * 0.18 - ausschlag, y + hoch / 2); // rechter Fuß
   stift.stroke();
 
-  // Die Pistole hält er in der rechten Hand — sie wandert also mit, wenn der
-  // Arm beim Laufen schwingt.
+  // Pistole rechts, Spitzhacke links — beide wandern mit, wenn die Arme beim
+  // Laufen schwingen.
   pistoleZeichnen(x + hoch * 0.25 + ausschlag, schulter + hoch * 0.12, hoch);
+  spitzhackeZeichnen(x - hoch * 0.25 - ausschlag, schulter + hoch * 0.12, hoch);
+}
+
+// Ein Stiel, der über die Schulter ragt, und oben quer der Hackenkopf.
+function spitzhackeZeichnen(x, y, hoch) {
+  const lang = hoch * 0.55;
+
+  stift.strokeStyle = figur.stielfarbe;
+  stift.lineWidth = Math.max(2, hoch * 0.055);
+  stift.lineCap = "round";
+  stift.beginPath();
+  stift.moveTo(x + hoch * 0.06, y + hoch * 0.1); // unten in der Hand
+  stift.lineTo(x - hoch * 0.12, y - lang + hoch * 0.1); // oben über der Schulter
+  stift.stroke();
+
+  // Der Kopf: zwei Spitzen, die nach unten zeigen.
+  const kx = x - hoch * 0.12;
+  const ky = y - lang + hoch * 0.1;
+  stift.strokeStyle = figur.pistolenfarbe;
+  stift.lineWidth = Math.max(2, hoch * 0.05);
+  stift.beginPath();
+  stift.moveTo(kx - hoch * 0.13, ky + hoch * 0.07);
+  stift.quadraticCurveTo(kx, ky - hoch * 0.03, kx + hoch * 0.13, ky + hoch * 0.07);
+  stift.stroke();
 }
 
 // Lauf nach vorn, Griff nach unten.
