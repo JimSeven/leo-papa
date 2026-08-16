@@ -93,6 +93,22 @@ try {
       new Promise((f) => setTimeout(() => f(false), 3000)),
     ]);
     pruefe("Änderung löst Neu-Laden aus", gemeldet);
+
+    // Zweimal `npm start` ist der Normalfall, nicht der Fehlerfall: der zweite
+    // soll den Browser aufmachen und sich verabschieden, nicht abstürzen.
+    const zweiter = spawn("node", ["dev-server.js"], {
+      cwd: import.meta.dirname,
+      env: { ...process.env, PORT: new URL(ADRESSE).port, OEFFNEN: "nein" },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let zweitesGesagtes = "";
+    zweiter.stdout.on("data", (d) => (zweitesGesagtes += d));
+    zweiter.stderr.on("data", (d) => (zweitesGesagtes += d));
+    const ende = await new Promise((f) => zweiter.on("exit", f));
+    pruefe(
+      "Zweiter Start meldet sich freundlich",
+      ende === 0 && zweitesGesagtes.includes("Läuft schon") && !zweitesGesagtes.includes("EADDRINUSE"),
+    );
   }
 } catch (problem) {
   pruefe(`Unerwarteter Abbruch: ${problem.message}`, false);

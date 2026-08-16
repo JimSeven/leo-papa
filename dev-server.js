@@ -83,6 +83,41 @@ watch(WURZEL, { recursive: true }, (_ereignis, name) => {
   }, 50);
 });
 
+// Läuft von einer früheren Session noch ein Server, ist das kein Fehler,
+// sondern der Normalfall — dann gehört der Browser aufgemacht und nicht ein
+// Stacktrace ausgegeben, während Leopold danebensitzt.
+server.on("error", (problem) => {
+  if (problem.code !== "EADDRINUSE") throw problem;
+  belegtenPortKlaeren();
+});
+
+async function belegtenPortKlaeren() {
+  const adresse = `http://localhost:${PORT}`;
+
+  if (await istUnserServer(adresse)) {
+    console.log(`\n  Läuft schon:  ${adresse}\n`);
+    if (process.env.OEFFNEN !== "nein") spawn("open", [adresse], { stdio: "ignore" });
+    process.exit(0);
+  }
+
+  console.error(
+    `\n  Port ${PORT} ist von etwas anderem belegt.` +
+      `\n  Anderer Port:  PORT=4322 npm start\n`,
+  );
+  process.exit(1);
+}
+
+// Nachsehen, ob dort wirklich das Spiel antwortet — sonst schickt ein fremder
+// Dienst auf demselben Port den Browser auf die falsche Seite.
+async function istUnserServer(adresse) {
+  try {
+    const antwort = await fetch(adresse, { signal: AbortSignal.timeout(1000) });
+    return (await antwort.text()).includes('id="bild"');
+  } catch {
+    return false;
+  }
+}
+
 server.listen(PORT, () => {
   const adresse = `http://localhost:${server.address().port}`;
   console.log(`\n  Leopolds Spiel läuft:  ${adresse}\n`);
