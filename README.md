@@ -34,6 +34,7 @@ Die neue Version steht nach etwa einer Minute unter der URL oben.
 | --- | --- |
 | `spiel.js` | Das ganze Spiel. Hier wird geändert. |
 | `index.html` | Die Seite drumherum. Selten anzufassen. |
+| `favicon.svg` | Das Icon im Tab und im Dock. |
 | `dev-server.js` | Liefert das Spiel aus und löst das Neu-Laden aus. |
 | `smoke.js` | Der Check vor dem Commit. |
 

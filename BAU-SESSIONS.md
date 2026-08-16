@@ -16,16 +16,17 @@ ADHS ist Randbedingung, nicht Thema. Kein Therapiespiel — aber bewusst gegen a
 
 1. **Kurze Runde:** Was soll heute anders sein?
 2. **Eine Sache bauen.** Eine.
-3. **Veröffentlichen** — `git push`. Danach steht die neue Version für Leopold bereit.
-4. **Er spielt allein**, was gerade entstanden ist.
+3. **Er spielt allein**, was gerade entstanden ist — sofort, im offenen Browser.
+4. **Veröffentlichen** — `git push`, während er spielt. Kein Warten für ihn.
 5. **Festlegen**, was nächstes Mal dran ist.
 
-Am Ende jeder Session existiert eine Version, die er ohne Papa spielen kann:
+Gespielt wird am Session-Ende lokal, ohne Wartezeit. Der Push ist dafür da, dass
+Leopold **zwischen** den Sessions allein rankommt:
 **https://jimseven.github.io/leo-papa/**
 
-Der Push ist der bewusste Abschluss — committen ist nur für uns, pushen ist das
-Veröffentlichen. *(revidierbar: falls sich das Warten auf den Build zäh anfühlt,
-kann die Veröffentlichung auch automatisch bei jedem Commit laufen)*
+Committen ist nur für uns, pushen ist das Veröffentlichen — die neue Version steht
+etwa eine Minute später unter der URL. *(revidierbar: wenn sich das als lästig
+erweist, kann die Veröffentlichung auch bei jedem Commit automatisch laufen)*
 
 ## Wer macht was
 
@@ -51,6 +52,15 @@ Geparktes muss sichtbar bleiben, sonst erdet es nicht. Wo die Liste lebt: [Issue
 ## Was bewusst offen bleibt
 
 Spielkonzept, Figuren, Story, Mechanik, Grafikstil, Name. Das kommt von Leopold, beim Bauen, aus dem Ausprobieren heraus. Nichts davon wird vorab entschieden.
+
+## Leopolds Zugang (einmalig einrichten)
+
+Damit er ohne Papa und ohne Browser-Bedienung rankommt: **https://jimseven.github.io/leo-papa/**
+in Safari öffnen, dann *Ablage → Zum Dock hinzufügen*. Ergebnis ist ein Icon im
+Dock, das er anklickt wie jedes andere Programm — kein Lesezeichen suchen, keine
+Adresse tippen. Das gelbe Quadrat als Icon macht es wiedererkennbar.
+
+Alternativ ein Lesezeichen in der Lesezeichenleiste, wenn ihm das lieber ist.
 
 ## Vor der ersten Session
 

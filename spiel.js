@@ -15,7 +15,7 @@ const figur = {
   x: 0, // wird beim Start in die Mitte gesetzt
   y: 0,
   groesse: 60,
-  farbe: "#ffd23f",
+  farbe: "#ffd23f", // dieselbe Farbe steckt auch in favicon.svg
   tempo: 420, // Pixel pro Sekunde
 };
 
