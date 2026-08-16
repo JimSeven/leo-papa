@@ -40,7 +40,38 @@ Leopolds Ideen werden im Kopf schnell sehr groß. Die KI lehnt nichts ab — sie
 
 > "Starke Idee. Die bauen wir, aber nicht heute — ich schreib sie auf die Liste. Heute machen wir erst X fertig."
 
-Geparktes muss sichtbar bleiben, sonst erdet es nicht. Wo die Liste lebt: [Issue #5](https://github.com/JimSeven/leo-papa/issues/5).
+Geparktes muss sichtbar bleiben, sonst erdet es nicht: **Leopold drückt `i` und
+sieht seine Liste im Spiel.** Gebautes bleibt abgehakt stehen — die Häkchen sind
+der Beweis, dass seine Ideen ankommen. *(revidierbar: wenn die Liste zu lang
+wird, um sie zu überblicken, fliegt Erledigtes raus)*
+
+Die Liste hat **kein Loch zwischen den Sessions**. Was ihm am Mittwoch einfällt
+und bis Samstag nicht überlebt, ist weg — und das ist Absicht, nicht Nachlässigkeit:
+der Filter gehört zur Bremse. Papa merkt sich, was ihm wichtig erscheint.
+
+## Das Gedächtnis
+
+`SPIELSTAND.md` ist das, was zwischen zwei Sessions überlebt. **Eine** Datei, vier
+Abschnitte:
+
+| Abschnitt | Was drin steht | Wer liest es |
+| --- | --- | --- |
+| **So ist das Spiel** | Leopolds Entscheidungen, im Präsens („Flauschi ist grün") | die KI |
+| **Wörter** | Fantasienamen und ihre Schreibweise | die KI |
+| **Ideenliste** | geparkte Ideen, in seinen Worten | **Leopold**, Taste `i` |
+| **Nächstes Mal** | was beim nächsten Mal dran ist | **Leopold**, Taste `i` |
+
+Zwei Regeln, an denen alles hängt:
+
+- **Zustand, kein Protokoll.** Ändert sich etwas, wird die alte Zeile *ersetzt*,
+  nicht ergänzt — und die KI sagt es laut („Flauschi war grün, jetzt ist er rot").
+  Er soll hören, dass sein Wort etwas verändert hat. Die Historie hat git.
+- **Sofort, nicht am Session-Ende.** Ideen in dem Moment, in dem er sie sagt;
+  Entscheidungen, sobald sie gebaut sind. Die letzten drei Minuten der 40 sind
+  die müdesten — dort darf nichts hängen.
+
+Das Spiel liest dieselbe Datei, aus der die KI liest. Es gibt keine zweite Liste,
+die veralten könnte. Die Regeln für die KI stehen in [CLAUDE.md](./CLAUDE.md).
 
 ## Technisches
 
@@ -64,4 +95,4 @@ Alternativ ein Lesezeichen in der Lesezeichenleiste, wenn ihm das lieber ist.
 
 ## Vor der ersten Session
 
-Offene Tickets auf der Karte: [#2 Diktat testen](https://github.com/JimSeven/leo-papa/issues/2) · [#3 Grundgerüst](https://github.com/JimSeven/leo-papa/issues/3) · [#4 Spielbare URL](https://github.com/JimSeven/leo-papa/issues/4) · [#5 Gedächtnis und Ideenliste](https://github.com/JimSeven/leo-papa/issues/5)
+Steht alles: [#2 Diktat getestet](https://github.com/JimSeven/leo-papa/issues/2) · [#3 Grundgerüst](https://github.com/JimSeven/leo-papa/issues/3) · [#4 Spielbare URL](https://github.com/JimSeven/leo-papa/issues/4) · [#5 Gedächtnis und Ideenliste](https://github.com/JimSeven/leo-papa/issues/5). Offen ist nur noch das, was auf der [Karte](https://github.com/JimSeven/leo-papa/issues/1) steht.

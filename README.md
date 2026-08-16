@@ -33,6 +33,7 @@ Die neue Version steht nach etwa einer Minute unter der URL oben.
 | Datei | Was drin ist |
 | --- | --- |
 | `spiel.js` | Das ganze Spiel. Hier wird geändert. |
+| `SPIELSTAND.md` | Was Leopold entschieden hat und was noch dran ist. Leopold sieht die Ideenliste im Spiel: Taste `i`. |
 | `index.html` | Die Seite drumherum. Selten anzufassen. |
 | `favicon.svg` | Das Icon im Tab und im Dock. |
 | `dev-server.js` | Liefert das Spiel aus und löst das Neu-Laden aus. |
