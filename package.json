@@ -1,0 +1,11 @@
+{
+  "name": "leo-papa",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Leopolds Spiel",
+  "scripts": {
+    "start": "node dev-server.js",
+    "smoke": "node smoke.js"
+  }
+}
