@@ -16,8 +16,10 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   Hand. Die Pistole schwingt beim Laufen mit dem Arm mit.
 - Gelaufen wird mit den Pfeiltasten, geschossen mit **W A S D** — jede Taste in
   ihre Richtung. So kann er in eine Richtung laufen und in eine andere
-  schießen. Die Leertaste schießt geradeaus dorthin, wo er hinguckt (am
-  Controller der untere Knopf).
+  schießen. Die Leertaste schießt geradeaus dorthin, wo er hinguckt.
+- Am Controller genauso: **linker Stick läuft, rechter Stick zielt und
+  schießt**, solange man ihn hält. Das Steuerkreuz läuft auch, und der untere
+  Knopf schießt geradeaus.
 - Die Kugel bleibt an der Wand liegen. Schießt oder läuft er nach links, dreht
   er sich mitsamt Pistole um.
 - Er läuft durch ein Labyrinth. Durch die Wände kommt er nicht durch, aber

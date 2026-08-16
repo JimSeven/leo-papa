@@ -80,27 +80,37 @@ function controller() {
   return alleControllern().find((pad) => pad.connected) ?? null;
 }
 
-// Billige Controller legen den linken Stick mal auf die Achsen 0/1, mal auf
-// 2/3. Beide Paare werden gelesen — dann läuft die Figur in jedem Fall, und bei
-// einem normalen Controller tut eben der rechte Stick dasselbe.
+// Am Controller gilt dasselbe wie an der Tastatur: eine Hand läuft, die andere
+// schießt. Der linke Stick läuft, der rechte zielt und schießt von allein,
+// solange er ausgelenkt ist.
+
+// Ein Stick liegt auf zwei Achsen nebeneinander. Steht er in der Mitte,
+// kommt {x: 0, y: 0} zurück.
+function stick(pad, links, hoch) {
+  const x = pad.axes[links] ?? 0;
+  const y = pad.axes[hoch] ?? 0;
+  return {
+    x: Math.abs(x) > TOTZONE ? x : 0,
+    y: Math.abs(y) > TOTZONE ? y : 0,
+  };
+}
+
 function controllerRichtung(pad) {
-  let x = 0;
-  let y = 0;
-  for (const [links, hoch] of [
-    [0, 1],
-    [2, 3],
-  ]) {
-    if (Math.abs(pad.axes[links] ?? 0) > TOTZONE) x += pad.axes[links];
-    if (Math.abs(pad.axes[hoch] ?? 0) > TOTZONE) y += pad.axes[hoch];
-  }
+  const { x, y } = stick(pad, 0, 1);
 
-  // Das Steuerkreuz liegt im Standard-Layout auf den Knöpfen 12 bis 15.
-  if (pad.buttons[12]?.pressed) y -= 1;
-  if (pad.buttons[13]?.pressed) y += 1;
-  if (pad.buttons[14]?.pressed) x -= 1;
-  if (pad.buttons[15]?.pressed) x += 1;
+  // Das Steuerkreuz liegt im Standard-Layout auf den Knöpfen 12 bis 15 und
+  // läuft ebenfalls — manche Controller haben gar keinen linken Stick.
+  return {
+    x: x + (pad.buttons[14]?.pressed ? -1 : 0) + (pad.buttons[15]?.pressed ? 1 : 0),
+    y: y + (pad.buttons[12]?.pressed ? -1 : 0) + (pad.buttons[13]?.pressed ? 1 : 0),
+  };
+}
 
-  return { x, y };
+// Der rechte Stick. Hat der Controller nur zwei Achsen, gibt es ihn nicht —
+// dann bleibt der untere Knopf zum Schießen.
+function controllerZielen(pad) {
+  if (pad.axes.length < 4) return { x: 0, y: 0 };
+  return stick(pad, 2, 3);
 }
 
 // Sagt Bescheid, sobald ein Controller da ist. Das Ereignis dafür kommt erst,
@@ -160,8 +170,12 @@ function diagnoseText() {
 
   const pad = controller();
   if (pad) {
-    const richtung = controllerRichtung(pad);
-    zeilen.push(`Daraus wird: links/rechts ${zahl(richtung.x)}   hoch/runter ${zahl(richtung.y)}`);
+    const laufen = controllerRichtung(pad);
+    const zielen = controllerZielen(pad);
+    zeilen.push(
+      `Laufen (linker Stick):  ${zahl(laufen.x)}  ${zahl(laufen.y)}`,
+      `Schießen (rechter Stick): ${zahl(zielen.x)}  ${zahl(zielen.y)}`,
+    );
   }
   return zeilen.join("\n");
 }
@@ -457,6 +471,16 @@ function schussTastenPruefen() {
     x += richtung[0];
     y += richtung[1];
   }
+
+  const pad = controller();
+  if (pad) {
+    const gezielt = controllerZielen(pad);
+    x += gezielt.x;
+    y += gezielt.y;
+    // Der untere Knopf (A bzw. X) schießt geradeaus — wie die Leertaste.
+    if (pad.buttons[0]?.pressed && x === 0 && y === 0) schiessen();
+  }
+
   if (x !== 0 || y !== 0) schiessen({ x, y });
 }
 
@@ -502,9 +526,6 @@ function bewegen(sekunden) {
     const vomStick = controllerRichtung(pad);
     xRichtung += vomStick.x;
     yRichtung += vomStick.y;
-
-    // Am Controller wird mit dem unteren Knopf geschossen (A bzw. X).
-    if (pad.buttons[0]?.pressed) schiessen();
   }
 
   if (xRichtung === 0 && yRichtung === 0) return;
