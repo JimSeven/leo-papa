@@ -293,6 +293,7 @@ ideenLaden(); // die Liste steht bereit, bevor er das erste Mal i drückt
 // durchgebrochen, bis alle dran waren. So bleibt jede Ecke erreichbar — man
 // kann sich verlaufen, aber nie einsperren.
 
+const SANDBREITE = 300; // der Sandplatz rechts neben dem Labyrinth
 const ZELLE = 110; // wie breit ein Gang ist
 const MAUER = 14; // wie dick eine Wand ist
 const MAUERFARBE = "#3b4a63";
@@ -301,14 +302,13 @@ const PLATZ = 22; // so viel Platz braucht der Cowboy um sich herum
 let labyrinth = null;
 
 function labyrinthBauen() {
-  // Rundherum bleibt etwas Luft, damit man den Cowboy beim Rausgehen noch
-  // sieht und der Ausgang nicht am Fensterrand klebt.
+  // Rechts bleibt der Sandplatz frei, rundherum etwas Luft.
   const RAND = 70;
-  const spalten = Math.max(3, Math.floor((innerWidth - MAUER - RAND) / ZELLE));
+  const spalten = Math.max(3, Math.floor((innerWidth - MAUER - RAND - SANDBREITE) / ZELLE));
   const zeilen = Math.max(3, Math.floor((innerHeight - MAUER - RAND) / ZELLE));
 
-  // Mittig ins Fenster, damit rundherum gleich viel Rand bleibt.
-  const x0 = (innerWidth - spalten * ZELLE) / 2;
+  // Mittig in den Platz links vom Sandplatz.
+  const x0 = (innerWidth - SANDBREITE - spalten * ZELLE) / 2;
   const y0 = (innerHeight - zeilen * ZELLE) / 2;
 
   const zellen = [];
@@ -385,9 +385,54 @@ function stecktInMauer(x, y, rand = PLATZ) {
   );
 }
 
-// Hinter dem Loch in der rechten Mauer ist er draußen.
+// ---------------------------------------------------------------------------
+// Der Sandplatz
+// ---------------------------------------------------------------------------
+
+// Rechts neben dem Labyrinth, hinter dem Ausgang. Hier stehen drei Häuser —
+// kaufen kann man dort noch nichts, das kommt später.
+
+const SANDFARBE = "#c8a870";
+const HAUSFARBEN = ["#b8543a", "#8d6a4f", "#5b7fa6"];
+
+function sandplatzZeichnen() {
+  const links = labyrinth.x0 + labyrinth.breit + MAUER;
+  stift.fillStyle = SANDFARBE;
+  stift.fillRect(links, 0, innerWidth - links, innerHeight);
+
+  // Drei Häuser untereinander: Kasten mit Dach und einer Tür.
+  const breit = 120;
+  const hoch = 90;
+  const x = links + (innerWidth - links - breit) / 2;
+
+  for (let i = 0; i < 3; i++) {
+    const y = innerHeight * (0.2 + i * 0.28);
+
+    stift.fillStyle = HAUSFARBEN[i];
+    stift.fillRect(x, y, breit, hoch);
+
+    stift.beginPath(); // das Dach
+    stift.moveTo(x - 12, y);
+    stift.lineTo(x + breit / 2, y - 40);
+    stift.lineTo(x + breit + 12, y);
+    stift.closePath();
+    stift.fillStyle = "#4a3527";
+    stift.fill();
+
+    stift.fillStyle = "#2f2117"; // die Tür
+    stift.fillRect(x + breit / 2 - 16, y + hoch - 42, 32, 42);
+  }
+}
+
+// Ganz rechts hinter den Häusern geht es ins nächste Labyrinth.
 function istDraussen() {
-  return figur.x > labyrinth.x0 + labyrinth.breit;
+  return figur.x > innerWidth - 26;
+}
+
+// Nirgends aus dem Fenster hinaus.
+function imFensterHalten() {
+  const halb = figur.groesse / 2;
+  figur.y = Math.min(Math.max(figur.y, halb), innerHeight - halb);
 }
 
 // Mitten im Loch — dorthin wird der grüne Schein gemalt.
@@ -691,6 +736,7 @@ function bewegen(sekunden) {
 
   const strecke = figur.tempo * sekunden;
   verschieben(figur, blick.x * strecke, blick.y * strecke);
+  imFensterHalten();
 }
 
 // Der Mensch wird aus lauter kleinen Strichen und einem Kreis gebaut. Alle Maße
@@ -803,6 +849,8 @@ function pistoleZeichnen(x, y, hoch) {
 function zeichnen() {
   stift.fillStyle = HINTERGRUND;
   stift.fillRect(0, 0, innerWidth, innerHeight);
+
+  sandplatzZeichnen();
 
   // Der Ausgang leuchtet und pulsiert, damit man ihn von weitem sieht.
   const tuer = ausgangMitte();

@@ -32,7 +32,9 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   jede Ecke ist erreichbar. Er startet oben links, und jedes Labyrinth ist
   anders.
 - Rechts unten ist der Ausgang: ein grün leuchtendes Loch in der Außenmauer.
-  Wer durchläuft, kriegt ein neues Labyrinth mit neuen Zombies. Oben links
+- Hinter dem Ausgang liegt der Sandplatz mit drei Häusern. Kaufen kann man dort
+  noch nichts — das steht auf der Ideenliste. Läuft er ganz rechts an den
+  Häusern vorbei, kommt ein neues Labyrinth mit neuen Zombies. Oben links
   steht, wie viele er schon geschafft hat.
 
 Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
@@ -46,6 +48,7 @@ entschieden hat.
 
 - [x] Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
 - Eine Mine neben dem Labyrinth, wo man mit der Spitzhacke Geld verdienen kann
-- Ein Sandplatz mit ein paar Häusern, wo man sich was kaufen kann
+- [x] Ein Sandplatz mit ein paar Häusern (der Anfang — kaufen geht noch nicht)
+- In den Häusern auf dem Sandplatz was kaufen können
 
 ## Nächstes Mal
