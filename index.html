@@ -62,10 +62,28 @@
         margin: 0;
         color: #7d8598;
       }
+
+      /* Controller-Diagnose, Taste g. Nur für Papa. */
+      #diagnose {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 1em 1.2em;
+        max-width: 100%;
+        overflow-x: auto;
+        background: rgba(0, 0, 0, 0.85);
+        color: #9ef01a;
+        font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        white-space: pre;
+        pointer-events: none; /* nie im Weg beim Spielen */
+      }
     </style>
   </head>
   <body>
     <canvas id="bild"></canvas>
+
+    <pre id="diagnose" hidden></pre>
 
     <div id="ideen" hidden>
       <div class="blatt">

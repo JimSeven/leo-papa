@@ -52,6 +52,119 @@ addEventListener("keyup", (e) => gedrueckt.delete(taste(e)));
 addEventListener("blur", () => gedrueckt.clear()); // Fenster verlassen = alle Tasten los
 
 // ---------------------------------------------------------------------------
+// Der Controller
+// ---------------------------------------------------------------------------
+
+// Ein Controller muss nicht angemeldet werden: Sobald einer verbunden ist,
+// taucht er hier auf, und Tastatur und Controller gehen beide weiter.
+
+const TOTZONE = 0.25; // ein Stick steht nie ganz genau auf null
+
+// Die Liste hat feste Steckplätze und enthält Löcher (null). Ein Controller
+// erscheint darin je nach Browser erst, nachdem das Spielfenster vorne war und
+// ein Knopf gedrückt wurde — deshalb wird jedes Bild neu nachgesehen statt sich
+// auf `gamepadconnected` zu verlassen. Fällt der aktive weg, greift von selbst
+// der nächste.
+function alleControllern() {
+  return [...(navigator.getGamepads?.() ?? [])].filter(Boolean);
+}
+
+function controller() {
+  return alleControllern().find((pad) => pad.connected) ?? null;
+}
+
+// Billige Controller legen den linken Stick mal auf die Achsen 0/1, mal auf
+// 2/3. Beide Paare werden gelesen — dann läuft die Figur in jedem Fall, und bei
+// einem normalen Controller tut eben der rechte Stick dasselbe.
+function controllerRichtung(pad) {
+  let x = 0;
+  let y = 0;
+  for (const [links, hoch] of [
+    [0, 1],
+    [2, 3],
+  ]) {
+    if (Math.abs(pad.axes[links] ?? 0) > TOTZONE) x += pad.axes[links];
+    if (Math.abs(pad.axes[hoch] ?? 0) > TOTZONE) y += pad.axes[hoch];
+  }
+
+  // Das Steuerkreuz liegt im Standard-Layout auf den Knöpfen 12 bis 15.
+  if (pad.buttons[12]?.pressed) y -= 1;
+  if (pad.buttons[13]?.pressed) y += 1;
+  if (pad.buttons[14]?.pressed) x -= 1;
+  if (pad.buttons[15]?.pressed) x += 1;
+
+  return { x, y };
+}
+
+// Sagt Bescheid, sobald ein Controller da ist. Das Ereignis dafür kommt erst,
+// wenn das Spielfenster vorne ist und ein Knopf gedrückt wurde — deshalb wird
+// stattdessen in jedem Bild nachgesehen, ob einer antwortet.
+let controllerMeldungBis = 0;
+let controllerWarDa = false;
+
+// ---------------------------------------------------------------------------
+// Controller-Diagnose (Taste g)
+// ---------------------------------------------------------------------------
+
+// Für Papa, wenn ein Controller nicht tut. Zeigt roh, was der Browser meldet —
+// die drei häufigsten Ursachen (Fenster nicht vorne, noch kein Knopf gedrückt,
+// abweichende Achsen) sind hier direkt ablesbar.
+
+const diagnose = document.getElementById("diagnose");
+let diagnoseOffen = new URL(location.href).searchParams.has("debug");
+
+function zahl(wert) {
+  return (wert < 0 ? "" : " ") + wert.toFixed(2);
+}
+
+function diagnoseText() {
+  if (!navigator.getGamepads) return "Dieser Browser kann keine Controller.";
+
+  const zeilen = [
+    `Fenster vorne:  ${document.hasFocus() ? "ja" : "NEIN — hier reinklicken!"}`,
+    `Steckplätze:    ${(navigator.getGamepads() ?? []).length}`,
+    "",
+  ];
+
+  const pads = alleControllern();
+  if (pads.length === 0) {
+    zeilen.push(
+      "Kein Controller zu sehen.",
+      "",
+      "Der Browser rückt ihn erst raus, wenn dieses Fenster vorne ist",
+      "und danach ein Knopf am Controller gedrückt wurde. Also: hier",
+      "reinklicken, dann am Controller drücken.",
+    );
+    return zeilen.join("\n");
+  }
+
+  for (const pad of pads) {
+    const gedrueckte = pad.buttons
+      .map((knopf, nr) => (knopf.pressed ? nr : null))
+      .filter((nr) => nr !== null);
+    zeilen.push(
+      `[${pad.index}] ${pad.id}`,
+      `     mapping: ${pad.mapping || "(leer)"}   verbunden: ${pad.connected ? "ja" : "nein"}`,
+      `     Achsen (${pad.axes.length}):  ${[...pad.axes].map(zahl).join("  ")}`,
+      `     Knöpfe (${pad.buttons.length}): ${gedrueckte.length ? gedrueckte.join(", ") : "keiner gedrückt"}`,
+      "",
+    );
+  }
+
+  const pad = controller();
+  if (pad) {
+    const richtung = controllerRichtung(pad);
+    zeilen.push(`Daraus wird: links/rechts ${zahl(richtung.x)}   hoch/runter ${zahl(richtung.y)}`);
+  }
+  return zeilen.join("\n");
+}
+
+function diagnoseZeichnen() {
+  diagnose.hidden = !diagnoseOffen;
+  if (diagnoseOffen) diagnose.textContent = diagnoseText();
+}
+
+// ---------------------------------------------------------------------------
 // Die Ideenliste (Taste i)
 // ---------------------------------------------------------------------------
 
@@ -137,6 +250,7 @@ function ideenUmschalten(offen) {
 // tut es auch ein Klick — die naheliegendste Geste, wenn man weiterspielen will.
 addEventListener("keydown", (e) => {
   if (taste(e) === "i") ideenUmschalten(!ideenOffen);
+  else if (taste(e) === "g") diagnoseOffen = !diagnoseOffen; // Controller-Diagnose
   else if (e.key === "Escape") ideenUmschalten(false);
 });
 ideenLayer.addEventListener("pointerdown", () => ideenUmschalten(false));
@@ -182,6 +296,17 @@ function bewegen(sekunden) {
     yRichtung += richtung[1];
   }
 
+  const pad = controller();
+  if (pad) {
+    if (!controllerWarDa) {
+      controllerWarDa = true;
+      controllerMeldungBis = performance.now() + 3000;
+    }
+    const vomStick = controllerRichtung(pad);
+    xRichtung += vomStick.x;
+    yRichtung += vomStick.y;
+  }
+
   if (xRichtung === 0 && yRichtung === 0) return;
   schonBewegt = true;
 
@@ -205,10 +330,15 @@ function zeichnen() {
   stift.fillStyle = figur.farbe;
   stift.fillRect(figur.x - halb, figur.y - halb, figur.groesse, figur.groesse);
 
-  if (!schonBewegt) {
+  stift.font = "24px system-ui, sans-serif";
+  stift.textAlign = "center";
+  stift.textBaseline = "alphabetic";
+
+  if (performance.now() < controllerMeldungBis) {
+    stift.fillStyle = "#ffd23f";
+    stift.fillText("Controller ist da!", innerWidth / 2, innerHeight - 60);
+  } else if (!schonBewegt) {
     stift.fillStyle = "#7d8598";
-    stift.font = "24px system-ui, sans-serif";
-    stift.textAlign = "center";
     stift.fillText("Drück die Pfeiltasten", innerWidth / 2, innerHeight - 60);
   }
 }
@@ -221,6 +351,7 @@ function schleife(jetzt) {
 
   bewegen(sekunden);
   zeichnen();
+  diagnoseZeichnen();
 
   requestAnimationFrame(schleife);
 }
