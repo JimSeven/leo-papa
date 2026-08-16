@@ -86,6 +86,17 @@ die veralten könnte. Die Regeln für die KI stehen in [CLAUDE.md](./CLAUDE.md).
 - **HTML/Canvas**, eine flache Codebasis im Repo. Kein Editor, den jemand lernen muss.
   *(Godot verworfen: Editor-Bedienung. Scratch verworfen: für die KI nicht editierbar.)*
 - **MacBook, ein Bildschirm**, Split zwischen Browser und Terminal. Terminal darf sichtbar sein.
+- **Safari, sobald mit Controller gespielt wird.** Safari geht über Apples
+  Game-Controller-Framework und erkennt den Switch-Pro-Controller sauber
+  (`mapping: standard`). Chrome spricht die Geräte direkt über HID an und sieht
+  ihn gar nicht — auch nicht auf fremden Gamepad-Testseiten, also ein bekannter
+  Chromium-Bug und nichts, was sich hier reparieren ließe. Weder die
+  macOS-Berechtigungen noch Chromes HID-Einstellung ändern etwas; letztere
+  betrifft WebHID, eine andere Schnittstelle. Zum Entwickeln bleibt Chrome
+  benutzbar, nur eben ohne Controller.
+- **Der Browser gibt den Controller nur an das Fenster, das vorne ist.** Wer im
+  Terminal tippt, steuert nichts — das sieht aus wie ein kaputter Controller und
+  ist keiner. Taste `g` im Spiel zeigt, was der Browser tatsächlich meldet.
 - **Keine Tests am Anfang.** Stattdessen: Commit nach jedem funktionierenden Stand, davor ein 10-Sekunden-Smoke-Check — startet es, kann er sich bewegen? Tests erst, wenn es stabile Regeln gibt.
 
 ## Was bewusst offen bleibt
