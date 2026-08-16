@@ -2,13 +2,17 @@
 // eine Datei ändert. Absichtlich ohne Abhängigkeiten — nichts zu installieren,
 // nichts, das am Samstagmorgen kaputt sein kann.
 
+import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { watch } from "node:fs";
 import { extname, join, resolve, sep } from "node:path";
 
 const WURZEL = resolve(import.meta.dirname);
-const PORT = 4321;
+
+// PORT=0 lässt das Betriebssystem einen freien Port wählen — der Smoke-Check
+// nutzt das, damit er nie mit einem nebenher laufenden Dev-Server kollidiert.
+const PORT = process.env.PORT === undefined ? 4321 : Number(process.env.PORT);
 
 const TYPEN = {
   ".html": "text/html; charset=utf-8",
@@ -19,8 +23,6 @@ const TYPEN = {
   ".jpg": "image/jpeg",
   ".gif": "image/gif",
   ".svg": "image/svg+xml",
-  ".mp3": "audio/mpeg",
-  ".wav": "audio/wav",
 };
 
 // Offene Browser-Verbindungen, denen wir "neu laden" zurufen können.
@@ -62,10 +64,15 @@ const server = createServer(async (req, res) => {
   }
 });
 
+// Nur was das Spiel ausmacht, löst ein Neu-Laden aus. Sonst wirft jede Notiz,
+// die nebenbei geschrieben wird, Leopold aus dem laufenden Spiel.
+const SPIELDATEIEN = /\.(html|js|css|png|jpg|gif|svg)$/i;
+
 // fs.watch feuert pro Speichervorgang mehrfach — kurz sammeln, dann einmal senden.
 let timer = null;
 watch(WURZEL, { recursive: true }, (_ereignis, name) => {
-  if (!name || name.startsWith(".git") || name.startsWith("node_modules")) return;
+  if (!name || !SPIELDATEIEN.test(name)) return;
+  if (name.startsWith(".git") || name.startsWith("node_modules")) return;
   clearTimeout(timer);
   timer = setTimeout(() => {
     for (const res of lauscher) res.write("data: neu-laden\n\n");
@@ -74,5 +81,10 @@ watch(WURZEL, { recursive: true }, (_ereignis, name) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n  Leopolds Spiel läuft:  http://localhost:${PORT}\n`);
+  const adresse = `http://localhost:${server.address().port}`;
+  console.log(`\n  Leopolds Spiel läuft:  ${adresse}\n`);
+
+  // Ein Befehl soll reichen — der Browser geht von selbst auf.
+  // Wer das nicht will: OEFFNEN=nein npm start
+  if (process.env.OEFFNEN !== "nein") spawn("open", [adresse], { stdio: "ignore" });
 });

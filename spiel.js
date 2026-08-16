@@ -25,11 +25,12 @@ const HINTERGRUND = "#10131a";
 // So wird gesteuert
 // ---------------------------------------------------------------------------
 
+// Schlüssel durchgehend klein — siehe `taste()` weiter unten.
 const RICHTUNGEN = {
-  ArrowLeft: [-1, 0],
-  ArrowRight: [1, 0],
-  ArrowUp: [0, -1],
-  ArrowDown: [0, 1],
+  arrowleft: [-1, 0],
+  arrowright: [1, 0],
+  arrowup: [0, -1],
+  arrowdown: [0, 1],
   a: [-1, 0],
   d: [1, 0],
   w: [0, -1],
@@ -39,16 +40,22 @@ const RICHTUNGEN = {
 const gedrueckt = new Set();
 let schonBewegt = false;
 
+// Immer kleingeschrieben merken: mit Shift oder CapsLock meldet die Tastatur
+// beim Loslassen "A" statt "a", und die Figur liefe sonst ewig weiter.
+const taste = (e) => e.key.toLowerCase();
+
 addEventListener("keydown", (e) => {
-  gedrueckt.add(e.key);
-  if (RICHTUNGEN[e.key]) e.preventDefault(); // Pfeiltasten sollen die Seite nicht scrollen
+  gedrueckt.add(taste(e));
+  if (RICHTUNGEN[taste(e)]) e.preventDefault(); // Pfeiltasten sollen die Seite nicht scrollen
 });
-addEventListener("keyup", (e) => gedrueckt.delete(e.key));
+addEventListener("keyup", (e) => gedrueckt.delete(taste(e)));
 addEventListener("blur", () => gedrueckt.clear()); // Fenster verlassen = alle Tasten los
 
 // ---------------------------------------------------------------------------
 // Die Zeichenfläche füllt immer das ganze Fenster
 // ---------------------------------------------------------------------------
+
+document.body.style.background = HINTERGRUND; // Farbe steht nur hier, nicht auch im CSS
 
 function flaecheAnpassen() {
   const schaerfe = devicePixelRatio || 1;
