@@ -27,8 +27,11 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
 - Eine Kugel erledigt einen Zombie, und woanders taucht ein neuer auf. Oben
   links steht, wie viele er abgeballert hat.
 - Er läuft durch ein Labyrinth. Durch die Wände kommt er nicht durch, aber
-  jede Ecke ist erreichbar. Er startet oben links, und bei jedem Neuladen ist
-  das Labyrinth anders.
+  jede Ecke ist erreichbar. Er startet oben links, und jedes Labyrinth ist
+  anders.
+- Rechts unten ist der Ausgang: ein grün leuchtendes Loch in der Außenmauer.
+  Wer durchläuft, kriegt ein neues Labyrinth mit neuen Zombies. Oben links
+  steht, wie viele er schon geschafft hat.
 
 Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
 entschieden hat.

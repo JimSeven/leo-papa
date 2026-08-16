@@ -300,8 +300,11 @@ const PLATZ = 22; // so viel Platz braucht der Cowboy um sich herum
 let labyrinth = null;
 
 function labyrinthBauen() {
-  const spalten = Math.max(3, Math.floor((innerWidth - MAUER) / ZELLE));
-  const zeilen = Math.max(3, Math.floor((innerHeight - MAUER) / ZELLE));
+  // Rundherum bleibt etwas Luft, damit man den Cowboy beim Rausgehen noch
+  // sieht und der Ausgang nicht am Fensterrand klebt.
+  const RAND = 70;
+  const spalten = Math.max(3, Math.floor((innerWidth - MAUER - RAND) / ZELLE));
+  const zeilen = Math.max(3, Math.floor((innerHeight - MAUER - RAND) / ZELLE));
 
   // Mittig ins Fenster, damit rundherum gleich viel Rand bleibt.
   const x0 = (innerWidth - spalten * ZELLE) / 2;
@@ -352,13 +355,19 @@ function labyrinthBauen() {
       if (zelle(c, z).links) mauern.push({ x: x - halb, y: y - halb, b: MAUER, h: ZELLE + MAUER });
     }
   }
-  // Die beiden Außenwände, die keiner Zelle gehören: rechts und unten.
+  // Die beiden Außenwände, die keiner Zelle gehören: rechts und unten. Die
+  // rechte wird Zeile für Zeile gesetzt — bei der untersten bleibt sie weg,
+  // und genau dieses Loch ist der Ausgang.
   const breit = spalten * ZELLE;
   const hoch = zeilen * ZELLE;
-  mauern.push({ x: x0 + breit - halb, y: y0 - halb, b: MAUER, h: hoch + MAUER });
+  const ausgangZeile = zeilen - 1;
+  for (let z = 0; z < zeilen; z++) {
+    if (z === ausgangZeile) continue;
+    mauern.push({ x: x0 + breit - halb, y: y0 + z * ZELLE - halb, b: MAUER, h: ZELLE + MAUER });
+  }
   mauern.push({ x: x0 - halb, y: y0 + hoch - halb, b: breit + MAUER, h: MAUER });
 
-  labyrinth = { spalten, zeilen, x0, y0, mauern };
+  labyrinth = { spalten, zeilen, x0, y0, mauern, breit, hoch, ausgangZeile };
 }
 
 // Die Mitte einer Zelle — dort steht der Cowboy beim Start.
@@ -373,6 +382,19 @@ function stecktInMauer(x, y, rand = PLATZ) {
   return labyrinth.mauern.some(
     (m) => x + rand > m.x && x - rand < m.x + m.b && y + rand > m.y && y - rand < m.y + m.h,
   );
+}
+
+// Hinter dem Loch in der rechten Mauer ist er draußen.
+function istDraussen() {
+  return figur.x > labyrinth.x0 + labyrinth.breit;
+}
+
+// Mitten im Loch — dorthin wird der grüne Schein gemalt.
+function ausgangMitte() {
+  return {
+    x: labyrinth.x0 + labyrinth.breit,
+    y: labyrinth.y0 + labyrinth.ausgangZeile * ZELLE + ZELLE / 2,
+  };
 }
 
 // Erst nach links/rechts, dann nach oben/unten — getrennt. So bleibt wer auch
@@ -523,6 +545,20 @@ function anDenAnfang() {
   const start = zellenMitte(0, 0);
   figur.x = start.x;
   figur.y = start.y;
+}
+
+// Wer den Ausgang findet, kriegt ein neues Labyrinth — und die Zahl oben links
+// zählt eins hoch.
+let geschafft = 0;
+let geschafftMeldungBis = 0;
+
+function naechstesLabyrinth() {
+  geschafft++;
+  geschafftMeldungBis = performance.now() + 2500;
+  labyrinthBauen();
+  anDenAnfang();
+  zombiesNeu();
+  kugeln.length = 0;
 }
 
 flaecheAnpassen();
@@ -743,6 +779,15 @@ function zeichnen() {
   stift.fillStyle = HINTERGRUND;
   stift.fillRect(0, 0, innerWidth, innerHeight);
 
+  // Der Ausgang leuchtet und pulsiert, damit man ihn von weitem sieht.
+  const tuer = ausgangMitte();
+  const puls = 0.6 + Math.sin(performance.now() / 300) * 0.25;
+  stift.save();
+  stift.globalAlpha = puls;
+  stift.fillStyle = "#4de08a";
+  stift.fillRect(tuer.x - MAUER, tuer.y - ZELLE / 2 + MAUER, MAUER * 2, ZELLE - MAUER * 2);
+  stift.restore();
+
   stift.fillStyle = MAUERFARBE;
   for (const m of labyrinth.mauern) stift.fillRect(m.x, m.y, m.b, m.h);
 
@@ -763,12 +808,17 @@ function zeichnen() {
   stift.textBaseline = "top";
   stift.fillStyle = "#9bd15b";
   stift.fillText(`Zombies abgeballert: ${abgeballert}`, 18, 14);
+  stift.fillStyle = "#4de08a";
+  stift.fillText(`Labyrinthe geschafft: ${geschafft}`, 18, 46);
 
   stift.font = "24px system-ui, sans-serif";
   stift.textAlign = "center";
   stift.textBaseline = "alphabetic";
 
-  if (performance.now() < controllerMeldungBis) {
+  if (performance.now() < geschafftMeldungBis) {
+    stift.fillStyle = "#4de08a";
+    stift.fillText("Geschafft! Nächstes Labyrinth!", innerWidth / 2, innerHeight - 60);
+  } else if (performance.now() < controllerMeldungBis) {
     stift.fillStyle = "#ffd23f";
     stift.fillText("Controller ist da!", innerWidth / 2, innerHeight - 60);
   } else if (!schonBewegt) {
@@ -788,6 +838,7 @@ function schleife(jetzt) {
   kugelnBewegen(sekunden);
   zombiesBewegen(sekunden);
   treffer();
+  if (istDraussen()) naechstesLabyrinth();
   zeichnen();
   diagnoseZeichnen();
 
