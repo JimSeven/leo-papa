@@ -14,6 +14,10 @@ ADHS ist Randbedingung, nicht Thema. Kein Therapiespiel — aber bewusst gegen a
 
 **40 Minuten, ein fester Slot pro Wochenende.** Lieber aufhören, solange er noch will.
 
+Papa richtet vorher ein: `npm start` im einen Terminal, `claude` im anderen,
+Browser und Terminal nebeneinander. Dann tippt **Leopold** `/bauen` — das ist
+der Startschuss, und ab da redet er mit der KI, nicht mit Papa.
+
 1. **Kurze Runde:** Was soll heute anders sein?
 2. **Eine Sache bauen.** Eine.
 3. **Er spielt allein**, was gerade entstanden ist — sofort, im offenen Browser.
@@ -33,6 +37,10 @@ erweist, kann die Veröffentlichung auch bei jedem Commit automatisch laufen)*
 - **Leopold diktiert** seine Ideen selbst an die KI, in seinen eigenen Worten. Papa tippt nicht für ihn.
 - **Die KI setzt sofort um**, was in ~5 Minuten baubar ist. Rückfragen an Papa töten das Tempo.
 - **Papa kommt dazu**, wenn etwas die Struktur umwirft oder länger dauert als eine halbe Session.
+
+Wie sich die KI dabei zu verhalten hat — Ton, Ablauf, Zeitrahmen, Ideen-Bremse —
+steht in [`.claude/commands/bauen.md`](./.claude/commands/bauen.md). Wenn eine
+Session schief läuft, ist das die Datei, an der man dreht.
 
 ## Die Ideen-Bremse
 
