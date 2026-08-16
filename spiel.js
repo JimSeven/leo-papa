@@ -262,6 +262,109 @@ ideenUmschalten(false); // Startzustand aus dem Code, nicht bloß aus dem hidden
 ideenLaden(); // die Liste steht bereit, bevor er das erste Mal i drückt
 
 // ---------------------------------------------------------------------------
+// Das Labyrinth
+// ---------------------------------------------------------------------------
+
+// Das Labyrinth ist ein Gitter aus Zellen. Jede Zelle merkt sich nur zwei
+// Wände — die oben und die links —, denn die rechte Wand einer Zelle ist ja
+// schon die linke der Nachbarzelle. Außen kommt einmal rundherum eine Mauer.
+//
+// Gebaut wird es beim Start (und neu, wenn das Fenster seine Größe ändert):
+// von einer Zelle aus wird immer zu einem noch unbesuchten Nachbarn
+// durchgebrochen, bis alle dran waren. So bleibt jede Ecke erreichbar — man
+// kann sich verlaufen, aber nie einsperren.
+
+const ZELLE = 110; // wie breit ein Gang ist
+const MAUER = 14; // wie dick eine Wand ist
+const MAUERFARBE = "#3b4a63";
+const PLATZ = 22; // so viel Platz braucht der Cowboy um sich herum
+
+let labyrinth = null;
+
+function labyrinthBauen() {
+  const spalten = Math.max(3, Math.floor((innerWidth - MAUER) / ZELLE));
+  const zeilen = Math.max(3, Math.floor((innerHeight - MAUER) / ZELLE));
+
+  // Mittig ins Fenster, damit rundherum gleich viel Rand bleibt.
+  const x0 = (innerWidth - spalten * ZELLE) / 2;
+  const y0 = (innerHeight - zeilen * ZELLE) / 2;
+
+  const zellen = [];
+  for (let i = 0; i < spalten * zeilen; i++) {
+    zellen.push({ oben: true, links: true, besucht: false });
+  }
+  const zelle = (c, z) => zellen[z * spalten + c];
+
+  // Durchbrechen, immer tiefer, und zurück, wenn es nicht weitergeht.
+  const weg = [{ c: 0, z: 0 }];
+  zelle(0, 0).besucht = true;
+
+  while (weg.length > 0) {
+    const { c, z } = weg[weg.length - 1];
+    const nachbarn = [
+      { c, z: z - 1, wand: "oben", hier: true },
+      { c, z: z + 1, wand: "oben", hier: false },
+      { c: c - 1, z, wand: "links", hier: true },
+      { c: c + 1, z, wand: "links", hier: false },
+    ].filter((n) => n.c >= 0 && n.c < spalten && n.z >= 0 && n.z < zeilen && !zelle(n.c, n.z).besucht);
+
+    if (nachbarn.length === 0) {
+      weg.pop();
+      continue;
+    }
+
+    const gewaehlt = nachbarn[Math.floor(Math.random() * nachbarn.length)];
+    // Die Wand gehört mal dieser Zelle, mal der Nachbarzelle — je nachdem, in
+    // welche Richtung es geht.
+    if (gewaehlt.hier) zelle(c, z)[gewaehlt.wand] = false;
+    else zelle(gewaehlt.c, gewaehlt.z)[gewaehlt.wand] = false;
+
+    zelle(gewaehlt.c, gewaehlt.z).besucht = true;
+    weg.push({ c: gewaehlt.c, z: gewaehlt.z });
+  }
+
+  // Aus den Wänden werden Rechtecke — die kann man zeichnen und dagegenlaufen.
+  const mauern = [];
+  const halb = MAUER / 2;
+  for (let z = 0; z < zeilen; z++) {
+    for (let c = 0; c < spalten; c++) {
+      const x = x0 + c * ZELLE;
+      const y = y0 + z * ZELLE;
+      if (zelle(c, z).oben) mauern.push({ x: x - halb, y: y - halb, b: ZELLE + MAUER, h: MAUER });
+      if (zelle(c, z).links) mauern.push({ x: x - halb, y: y - halb, b: MAUER, h: ZELLE + MAUER });
+    }
+  }
+  // Die beiden Außenwände, die keiner Zelle gehören: rechts und unten.
+  const breit = spalten * ZELLE;
+  const hoch = zeilen * ZELLE;
+  mauern.push({ x: x0 + breit - halb, y: y0 - halb, b: MAUER, h: hoch + MAUER });
+  mauern.push({ x: x0 - halb, y: y0 + hoch - halb, b: breit + MAUER, h: MAUER });
+
+  labyrinth = { spalten, zeilen, x0, y0, mauern };
+}
+
+// Die Mitte einer Zelle — dort steht der Cowboy beim Start.
+function zellenMitte(c, z) {
+  return {
+    x: labyrinth.x0 + c * ZELLE + ZELLE / 2,
+    y: labyrinth.y0 + z * ZELLE + ZELLE / 2,
+  };
+}
+
+function stecktInMauer(x, y) {
+  return labyrinth.mauern.some(
+    (m) => x + PLATZ > m.x && x - PLATZ < m.x + m.b && y + PLATZ > m.y && y - PLATZ < m.y + m.h,
+  );
+}
+
+// Erst nach links/rechts, dann nach oben/unten — getrennt. So bleibt er an
+// einer Wand nicht kleben, sondern rutscht an ihr entlang weiter.
+function verschieben(dx, dy) {
+  if (!stecktInMauer(figur.x + dx, figur.y)) figur.x += dx;
+  if (!stecktInMauer(figur.x, figur.y + dy)) figur.y += dy;
+}
+
+// ---------------------------------------------------------------------------
 // Die Zeichenfläche füllt immer das ganze Fenster
 // ---------------------------------------------------------------------------
 
@@ -276,11 +379,23 @@ function flaecheAnpassen() {
   stift.setTransform(schaerfe, 0, 0, schaerfe, 0, 0);
 }
 
-addEventListener("resize", flaecheAnpassen);
-flaecheAnpassen();
+// Bei einer neuen Fenstergröße passt das alte Labyrinth nicht mehr — es wird
+// neu gebaut, und der Cowboy fängt wieder oben links an.
+addEventListener("resize", () => {
+  flaecheAnpassen();
+  labyrinthBauen();
+  anDenAnfang();
+});
 
-figur.x = innerWidth / 2;
-figur.y = innerHeight / 2;
+function anDenAnfang() {
+  const start = zellenMitte(0, 0);
+  figur.x = start.x;
+  figur.y = start.y;
+}
+
+flaecheAnpassen();
+labyrinthBauen();
+anDenAnfang();
 
 // ---------------------------------------------------------------------------
 // Was in jedem Bild passiert
@@ -326,13 +441,7 @@ function bewegen(sekunden) {
   // Schräg soll nicht schneller sein als gerade.
   const laenge = Math.hypot(xRichtung, yRichtung);
   const strecke = figur.tempo * sekunden;
-  figur.x += (xRichtung / laenge) * strecke;
-  figur.y += (yRichtung / laenge) * strecke;
-
-  // Am Rand ist Schluss.
-  const halb = figur.groesse / 2;
-  figur.x = Math.min(Math.max(figur.x, halb), innerWidth - halb);
-  figur.y = Math.min(Math.max(figur.y, halb), innerHeight - halb);
+  verschieben((xRichtung / laenge) * strecke, (yRichtung / laenge) * strecke);
 }
 
 // Der Mensch wird aus lauter kleinen Strichen und einem Kreis gebaut. Alle Maße
@@ -407,6 +516,9 @@ function pistoleZeichnen(x, y, hoch) {
 function zeichnen() {
   stift.fillStyle = HINTERGRUND;
   stift.fillRect(0, 0, innerWidth, innerHeight);
+
+  stift.fillStyle = MAUERFARBE;
+  for (const m of labyrinth.mauern) stift.fillRect(m.x, m.y, m.b, m.h);
 
   menschZeichnen(figur.x, figur.y);
 

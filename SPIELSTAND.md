@@ -14,6 +14,9 @@ Leopold sieht die beiden unteren Abschnitte im Spiel selbst: **Taste `i`**.
   Steht er still, hängt alles gerade runter.
 - Er ist ein Cowboy: brauner Cowboy-Hut auf dem Kopf, Pistole in der rechten
   Hand. Die Pistole schwingt beim Laufen mit dem Arm mit.
+- Er läuft durch ein Labyrinth. Durch die Wände kommt er nicht durch, aber
+  jede Ecke ist erreichbar. Er startet oben links, und bei jedem Neuladen ist
+  das Labyrinth anders.
 
 Größe und Tempo sind noch Platzhalter — sie stehen hier erst, wenn Leopold sie
 entschieden hat.
@@ -24,6 +27,6 @@ entschieden hat.
 
 ## Ideenliste
 
-- Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
+- [x] Ein Labyrinth im Hintergrund, wo der Cowboy durchläuft
 
 ## Nächstes Mal
